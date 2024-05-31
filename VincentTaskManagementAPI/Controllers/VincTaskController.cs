@@ -27,6 +27,7 @@ namespace VincentTaskManagementAPI.Controllers
 				[HttpGet]
 				public async Task<ActionResult<IEnumerable<VincTask>>> GetTasks()
 				{
+						var vicTask = new VincTasksStore();
 						var tasks = VincTasksStore.MyTasks;
 						if(tasks == null)
 						{
