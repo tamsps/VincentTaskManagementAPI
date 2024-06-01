@@ -9,5 +9,11 @@ namespace VincentTaskManagementAPI.Db
 				{
 				}
 				public DbSet<VincTaskModel> VincTasksModel { get; set; }
+				protected override void OnModelCreating(ModelBuilder builder)
+				{
+						builder.Entity<VincTaskModel>()
+								.HasIndex(u => u.Id)
+								.IsUnique();
+				}
 		}
 }

@@ -3,6 +3,7 @@ using log4net.Config;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using VincentTaskManagementAPI.Db;
+using VincentTaskManagementAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,8 @@ IConfigurationRoot configuration = new ConfigurationBuilder()
 //configure db context
 ////builder.Services.AddDbContext<VincDbContext>(options =>	options.UseSqlite(configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddDbContext<VincDbContext>(options => options.UseSqlite(@"Data source = "+Directory.GetCurrentDirectory()+ "\\Database\\vincetask.db"));
+
+builder.Services.AddScoped<ITaskService, TaskService>();
 
 //Configure log4net
 var logRepository = LogManager.GetRepository(System.Reflection.Assembly.GetEntryAssembly());
