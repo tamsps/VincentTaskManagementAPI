@@ -1,8 +1,13 @@
+using log4net.Config;
+using log4net.Core;
+using log4net;
 using Microsoft.AspNetCore.Mvc;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using VincentTaskManagementAPI.Db;
 using VincentTaskManagementAPI.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace VincentTaskManagementAPI.Controllers
 {
@@ -13,33 +18,36 @@ namespace VincentTaskManagementAPI.Controllers
 				/// <summary>
 				/// Create a new logger for the VincTaskController
 				/// </summary>
-				private readonly ILogger<VincTaskController> _logger;
+				ILog _logger = LogManager.GetLogger(typeof(VincTaskController));
+
+				private readonly VincDbContext _context;
+
 
 				/// <summary>
 				/// Create a constructor for the VincTaskController
 				/// </summary>
-				/// <param name="logger"></param>
-				public VincTaskController(ILogger<VincTaskController> logger)
+				/// <param name="context"></param>
+				public VincTaskController(VincDbContext context)
 				{
-						_logger = logger;
+						_context = context;
 				}
 
 				[HttpGet]
-				public async Task<ActionResult<IEnumerable<VincTask>>> GetTasks()
+				public async Task<ActionResult<IEnumerable<VincTaskModel>>> GetTasks()
 				{
-						var vicTask = new VincTasksStore();
-						var tasks = VincTasksStore.MyTasks;
-						if(tasks == null)
+						var tasks = await _context.VincTasksModel.ToListAsync();
+						if (tasks == null)
 						{
 								return NotFound("No data found");
 						}
+						_logger.Info("Get all tasks");
 						return Ok(tasks);
 				}
 
 				[HttpGet("{id}")]
-				public async Task<ActionResult<VincTask>> GetTaskById([FromRoute] int id)
+				public async Task<ActionResult<VincTaskModel>> GetTaskById([FromRoute] int id)
 				{
-						var task = VincTasksStore.MyTasks.First(d=>d.Id.Equals(id));
+						var task = await _context.VincTasksModel.FindAsync(id);
 						if (task == null)
 						{
 								return NotFound("No data found");
@@ -48,38 +56,44 @@ namespace VincentTaskManagementAPI.Controllers
 				}
 
 				[HttpPost]
-				public async Task<ActionResult<VincTask>> CreateTask([FromBody] VincTask task)
+				public async Task<ActionResult<VincTaskModel>> CreateTask([FromBody] VincTaskModel task)
 				{
-						_ = VincTasksStore.MyTasks.Append(task);
+						_context.VincTasksModel.Add(task);
+						await _context.SaveChangesAsync();
 						return CreatedAtAction(nameof(GetTaskById), new { id = task.Id }, task);
+
 				}
 
 				[HttpPut("{id}")]
-				public async Task<IActionResult> UpdateTask([FromRoute] int id, [FromBody] VincTask task)
+				public async Task<IActionResult> UpdateTask([FromRoute] int id, [FromBody] VincTaskModel task)
 				{
-						var updatedTask = VincTasksStore.MyTasks.First(d => d.Id.Equals(id));
-
+						var updatedTask = await _context.VincTasksModel.FindAsync(id);
 						if (updatedTask == null)
 						{
-								return NotFound("No data found");
+								return NotFound("Task not found");
 						}
+
 						updatedTask.Title = task.Title;
 						updatedTask.Priority = task.Priority;
 						updatedTask.Description = task.Description;
 						updatedTask.DueDate = task.DueDate;
 
+						await _context.SaveChangesAsync();
+
 						return NoContent();
+
 				}
 
 				[HttpDelete("{id}")]
 				public async Task<IActionResult> DeleteTask([FromRoute] int id)
 				{
-						var deleteTask = VincTasksStore.MyTasks.First(d => d.Id.Equals(id));
-						if (deleteTask == null)
+						var task = await _context.VincTasksModel.FindAsync(id);
+						if (task == null)
 						{
 								return NotFound("Task not found");
 						}
-						VincTasksStore.MyTasks.ToList().Remove(deleteTask);
+						_context.VincTasksModel.Remove(task);
+						await _context.SaveChangesAsync();
 						return NoContent();
 				}
 		}

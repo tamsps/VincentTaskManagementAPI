@@ -4,14 +4,14 @@ namespace VincentTaskManagementAPI.Db
 {
 		public class VincTasksStore
 		{
-				public static IEnumerable<VincTask> MyTasks { get; set; }
+				public static IEnumerable<VincTaskModel> MyTasks { get; set; }
 				public VincTasksStore()
 				{
 						if (MyTasks == null)
 						{
-								MyTasks = new List<VincTask>
+								MyTasks = new List<VincTaskModel>
 								{
-										new VincTask
+										new VincTaskModel
 										{
 												Id = 1,
 												Title = "Task 1",
@@ -19,7 +19,7 @@ namespace VincentTaskManagementAPI.Db
 												Description = "Task 1 Description",
 												DueDate = DateTime.Now.AddDays(1)
 										},
-										new VincTask
+										new VincTaskModel
 										{
 												Id = 2,
 												Title = "Task 2",
@@ -27,7 +27,7 @@ namespace VincentTaskManagementAPI.Db
 												Description = "Task 2 Description",
 												DueDate = DateTime.Now.AddDays(2)
 										},
-										new VincTask
+										new VincTaskModel
 										{
 												Id = 3,
 												Title = "Task 3",
