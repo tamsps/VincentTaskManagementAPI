@@ -10,6 +10,7 @@ using VincentTaskManagementAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using VincentTaskManagementAPI.Services;
 using Microsoft.AspNetCore.Diagnostics;
+using VincentTaskManagementAPI.HandleRecordResult;
 
 namespace VincentTaskManagementAPI.Controllers
 {
@@ -35,15 +36,13 @@ namespace VincentTaskManagementAPI.Controllers
 				}
 
 				[HttpGet]
-				public async Task<ActionResult<IEnumerable<VincTaskModel>>> GetTasks()
+				public async Task<ActionResult<IEnumerable<VincTaskModel>>> GetTasks([FromQuery] PagingParameters pagingParameters)
 				{
-						var tasks = _ITasksrc.GetTasks();
+						var tasks = _ITasksrc.GetTasks(pagingParameters);
 						if (tasks == null)
 						{
 								return NotFound("No data found");
 						}
-						var a = 0;
-						var d = 4/a;
 						return Ok(tasks);
 				}
 
