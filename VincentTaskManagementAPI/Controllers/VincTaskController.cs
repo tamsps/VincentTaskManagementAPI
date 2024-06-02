@@ -9,12 +9,13 @@ using VincentTaskManagementAPI.Db;
 using VincentTaskManagementAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using VincentTaskManagementAPI.Services;
+using Microsoft.AspNetCore.Diagnostics;
 
 namespace VincentTaskManagementAPI.Controllers
 {
 		[ApiController]
 		[Route("api/tasks")]
-		public class VincTaskController : ControllerBase
+		public class VincTaskController : BaseController
 		{
 				/// <summary>
 				/// Create a new logger for the VincTaskController
@@ -43,6 +44,8 @@ namespace VincentTaskManagementAPI.Controllers
 								return NotFound("No data found");
 						}
 						_logger.Info("End get all task");
+						int a = 0;
+						var d = 4 / a;
 						return Ok(tasks);
 				}
 
@@ -92,5 +95,7 @@ namespace VincentTaskManagementAPI.Controllers
 						
 						return Ok(task);
 				}
+
+			
 		}
 }
