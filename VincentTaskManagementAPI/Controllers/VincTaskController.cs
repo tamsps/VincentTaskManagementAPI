@@ -9,6 +9,7 @@ using VincentTaskManagementAPI.Db;
 using VincentTaskManagementAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using VincentTaskManagementAPI.Services;
+using Microsoft.AspNetCore.Diagnostics;
 
 namespace VincentTaskManagementAPI.Controllers
 {
@@ -36,13 +37,13 @@ namespace VincentTaskManagementAPI.Controllers
 				[HttpGet]
 				public async Task<ActionResult<IEnumerable<VincTaskModel>>> GetTasks()
 				{
-						_logger.Info("Begin get all task");
 						var tasks = _ITasksrc.GetTasks();
 						if (tasks == null)
 						{
 								return NotFound("No data found");
 						}
-						_logger.Info("End get all task");
+						var a = 0;
+						var d = 4/a;
 						return Ok(tasks);
 				}
 
@@ -92,5 +93,28 @@ namespace VincentTaskManagementAPI.Controllers
 						
 						return Ok(task);
 				}
+
+				[HttpGet]
+				[Route("/error-development")]
+				public IActionResult HandleErrorDevelopment(
+		[FromServices] IHostEnvironment hostEnvironment)
+				{
+						if (!hostEnvironment.IsDevelopment())
+						{
+								return NotFound();
+						}
+
+						var exceptionHandlerFeature =
+								HttpContext.Features.Get<IExceptionHandlerFeature>()!;
+
+						return Problem(
+								detail: exceptionHandlerFeature.Error.StackTrace,
+								title: exceptionHandlerFeature.Error.Message);
+				}
+				[HttpGet]
+				[Route("/error")]
+				public IActionResult HandleError() =>
+						Problem();
+
 		}
 }

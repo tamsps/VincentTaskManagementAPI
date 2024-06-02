@@ -3,13 +3,17 @@ using log4net.Config;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using VincentTaskManagementAPI.Db;
+using VincentTaskManagementAPI.HandleException;
 using VincentTaskManagementAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+		options.Filters.Add<HttpResponseExceptionFilter>();
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -33,9 +37,14 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+		app.UseExceptionHandler("/error-development");
 		app.UseSwagger();
 		app.UseSwaggerUI();
 } 
+else
+{
+		app.UseExceptionHandler("/error");
+}
 
 app.UseHttpsRedirection();
 
